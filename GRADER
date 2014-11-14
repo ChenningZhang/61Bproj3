@@ -1,0 +1,32 @@
+                                     GRADER
+
+Name of student running submit: Herman Wu 
+Login of student running submit: cs61b-md
+
+Second team member's name: Chenning Zhang
+Second team member's login: cs61b-jv
+
+Data Structures Used:
+  -Doubly-Linked Lists (from HW 5)
+  -Hash Tables with resizing (from HW 6)
+
+Design Decisions:
+  -Vertices and Edges both have their own internal representations.
+    -Vertices are represented by VertexNodes, which hold both the application representation of vertices, an adjacency list of edges (self-edges stored once), and the node in which it is stored in the graph's doubly-linked list of vertices.
+      -The size of the adjacency list is the degree, and since the adjacency list returns its size in O(1) time, so does degree(vertex).
+      -Since a VertexNode stores a reference to its own ListNode, removal takes O(1) time in the DList storing vertices in WUGraph.
+      -With the adjacency list, getNeighbors does indeed run in O(d) time, as it walks through the adjacency list, which has exactly d list nodes containing d edges.
+    -Similarly, edges are represented by Edges, which hold both vertices, its weight, the node in which it is stored in a vertex's adjacency edge, and a "partner" edge.
+      -Since we are using the "half-edge" representation, the order of vertices matters. An Edge with vertex1 = u and vertex2 = v is stored only in the adjacency list of u; the addEdge method in WUGraph also adds a "partner" Edge to the adjacency list of v, with reversed order.
+      -Self-edges are only added once, and the partner node is set to null.
+      -Every edge that is not a self-edge can access its partner quickly, so removeEdge runs in O(1) time. Again, the node reference scheme allows removal from adjacency lists in O(1) time.
+      -Weights are changed with a setter method, for better security.
+      -Partners are set by a method as well, which checks to see if it is a self-edge (by checking if vertex1 == vertex2).
+      -Edges contain a method for returning the VertexPair used to hash this edge.
+  -Both VertexNodes and Edges are stored in separate hash tables.
+    -Vertices are hashed by the original Object passed in. Edges are hashed by the VertexPair object given.
+    -The hash tables enable fast adding and verification of vertices and edges, virtually in O(1) time.
+  -RemoveVertex(v) uses the RemoveEdge method to remove all edges in v's adjacency list. Since RemoveEdge runs in O(1) time, removing all of v's edges runs in O(d) time, as required.
+    -Finally, after v's degree has been reduced to 0, it is removed from both the DList storing vertices and the hash table storing vertices using their respective remove methods (which run in O(1) time).
+    -Thus, the total runtime is in O(d) time.
+  -In addition to a hash table of vertices, a WUGraph also contains a doubly-linked list of vertices (or more accurately VertexNodes). This list is unsorted but it does enable getVertices to run in O(|V|) time, since that method simply walks through the linked list of vertices rather than the hash table.
